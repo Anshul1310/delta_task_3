@@ -63,86 +63,71 @@ fun UpdateScreen(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         StatusData(R.drawable.boy, "Anshul Negi", "10:00 pm"),
         StatusData(R.drawable.boy, "Anshul Negi", "10:00 pm")
     )
-    Scaffold(
-        containerColor = AppBlack,
-        bottomBar = { BottomNavigation(selectedTab = selectedTab, onTabSelected = onTabSelected) },
-        modifier = Modifier.fillMaxSize(),
-        floatingActionButton = {
-            FloatingActionButton(
-                containerColor = AppGreen,
-                onClick = {},
-                contentColor = AppBlack
+    Column(modifier = Modifier.fillMaxSize().background(AppBlack)) {
+        if (isSearching) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
             ) {
-                Icon(contentDescription = "", painter = painterResource(R.drawable.baseline_photo_camera_24))
+                TextField(
+                    value = searchedText,
+                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = { searchedText = it },
+                    placeholder = { Text(text = "Search", fontSize = 14.sp, color = AppGray) },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        cursorColor = AppGreen,
+                        focusedTextColor = AppWhite,
+                        unfocusedTextColor = AppWhite
+                    )
+                )
+                IconButton(
+                    onClick = { isSearching = false },
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Close,
+                        contentDescription = "",
+                        tint = AppWhite
+                    )
+                }
+            }
+        } else {
+            TopBar({ isSearching = true }, { isdotOpen = !isdotOpen })
+        }
+
+        Row(modifier = Modifier.fillMaxWidth().align(Alignment.End)) {
+            DropdownMenu(expanded = isdotOpen, onDismissRequest = { isdotOpen = false }) {
+                DropdownMenuItem(text = { Text("Anshul", color = AppWhite) }, onClick = { isdotOpen = false })
+                DropdownMenuItem(text = { Text("Anuj", color = AppWhite) }, onClick = { isdotOpen = false })
+                DropdownMenuItem(text = { Text("Yashveer", color = AppWhite) }, onClick = { isdotOpen = false })
             }
         }
-    ) {
-        Column(modifier = Modifier.padding(it).background(AppBlack)) {
-            if (isSearching) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                ) {
-                    TextField(
-                        value = searchedText,
-                        modifier = Modifier.fillMaxWidth(),
-                        onValueChange = { searchedText = it },
-                        placeholder = { Text(text = "Search", fontSize = 14.sp, color = AppGray) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            cursorColor = AppGreen,
-                            focusedTextColor = AppWhite,
-                            unfocusedTextColor = AppWhite
-                        )
-                    )
-                    IconButton(
-                        onClick = { isSearching = false },
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Close,
-                            contentDescription = "",
-                            tint = AppWhite
-                        )
-                    }
-                }
-            } else {
-                TopBar({ isSearching = true }, { isdotOpen = !isdotOpen })
-            }
 
-            Row(modifier = Modifier.fillMaxWidth().align(Alignment.End)) {
-                DropdownMenu(expanded = isdotOpen, onDismissRequest = { isdotOpen = false }) {
-                    DropdownMenuItem(text = { Text("Anshul", color = AppWhite) }, onClick = { isdotOpen = false })
-                    DropdownMenuItem(text = { Text("Anuj", color = AppWhite) }, onClick = { isdotOpen = false })
-                    DropdownMenuItem(text = { Text("Yashveer", color = AppWhite) }, onClick = { isdotOpen = false })
-                }
+        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(10.dp)
+        ) {
+            Text(text = "Status", fontWeight = FontWeight.SemiBold, fontSize = 24.sp, color = AppWhite)
+            MyStatus()
+            sampleStatusdata.forEach { item ->
+                Spacer(modifier = Modifier.height(16.dp))
+                MyStatusItem(item)
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(10.dp)
-            ) {
-                Text(text = "Status", fontWeight = FontWeight.SemiBold, fontSize = 24.sp, color = AppWhite)
-                MyStatus()
-                sampleStatusdata.forEach { item ->
-                    Spacer(modifier = Modifier.height(16.dp))
-                    MyStatusItem(item)
-                }
-                Spacer(modifier = Modifier.fillMaxWidth().height(16.dp))
-                HorizontalDivider(modifier = Modifier.fillMaxWidth(), color = AppDarkGray)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "Community", fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = AppWhite)
-                Text(text = "By joining the communities you get the info regarding communities in your area", color = AppGray)
-                Text(text = "Find Channels to follow", color = AppGreen)
-                communitiesModel.forEach { item ->
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CommunityItem(item)
-                }
+            Spacer(modifier = Modifier.fillMaxWidth().height(16.dp))
+            HorizontalDivider(modifier = Modifier.fillMaxWidth(), color = AppDarkGray)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Community", fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = AppWhite)
+            Text(text = "By joining the communities you get the info regarding communities in your area", color = AppGray)
+            Text(text = "Find Channels to follow", color = AppGreen)
+            communitiesModel.forEach { item ->
+                Spacer(modifier = Modifier.height(16.dp))
+                CommunityItem(item)
             }
         }
     }

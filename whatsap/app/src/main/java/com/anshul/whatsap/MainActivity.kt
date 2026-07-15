@@ -95,10 +95,6 @@ fun AppNavigation() {
             selectedTab = selectedTab,
             onTabSelected = { tab ->
                 selectedTab = tab
-                when (tab) {
-                    0 -> currentScreen = "home"
-                    1 -> currentScreen = "updates"
-                }
             }
         )
 
@@ -125,17 +121,6 @@ fun AppNavigation() {
             onGroupCreated = {
                 selectedTab = 0
                 currentScreen = "home"
-            }
-        )
-
-        "updates" -> UpdateScreen(
-            selectedTab = selectedTab,
-            onTabSelected = { tab ->
-                selectedTab = tab
-                when (tab) {
-                    0 -> currentScreen = "home"
-                    1 -> currentScreen = "updates"
-                }
             }
         )
     }

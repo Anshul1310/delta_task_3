@@ -44,22 +44,9 @@ fun SplashScreen() {
         visible = true
     }
 
-    val alpha by animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = tween(durationMillis = 1000),
-        label = "fade"
-    )
 
-    val pulseTransition = rememberInfiniteTransition(label = "pulse")
-    val scale by pulseTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.08f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "scale"
-    )
+
+
 
     Box(
         modifier = Modifier
@@ -68,16 +55,14 @@ fun SplashScreen() {
     ) {
         Column(
             modifier = Modifier
-                .align(Alignment.Center)
-                .alpha(alpha),
+                .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(R.drawable.whatsapp_icon),
                 contentDescription = "App Icon",
                 modifier = Modifier
-                    .size(100.dp)
-                    .scale(scale),
+                    .size(100.dp),
                 colorFilter = ColorFilter.tint(AppGreen)
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -90,13 +75,12 @@ fun SplashScreen() {
         }
 
         Text(
-            text = "Made with ❤",
+            text = "Made with ❤ by ANSHUL",
             fontSize = 14.sp,
             color = AppGray,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .alpha(alpha)
-                .then(Modifier.height(60.dp))
+                .then(Modifier.height(100.dp))
         )
     }
 }

@@ -24,7 +24,7 @@ fun BottomNavigation(selectedTab: Int, onTabSelected: (Int) -> Unit) {
     val items = listOf(
         BottomNavItem("Chats", R.drawable.message_4475881),
         BottomNavItem("Updates", R.drawable.update_icon),
-        BottomNavItem("Communities", R.drawable.communities_icon),
+        BottomNavItem("Community", R.drawable.communities_icon),
         BottomNavItem("Calls", R.drawable.telephone)
     )
 

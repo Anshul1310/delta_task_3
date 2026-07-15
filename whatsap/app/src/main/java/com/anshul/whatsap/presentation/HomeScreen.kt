@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import com.anshul.whatsap.ui.theme.AppGray
 import com.anshul.whatsap.ui.theme.AppGreen
 import com.anshul.whatsap.ui.theme.AppWhite
 import kotlinx.coroutines.flow.collectLatest
+import org.json.JSONObject
 
 @Composable
 fun HomeScreen(
@@ -113,7 +115,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         ChatSocketManager.messageFlow.collectLatest { rawMessage ->
             try {
-                val json = org.json.JSONObject(rawMessage)
+                val json = JSONObject(rawMessage)
                 val type = json.optString("type", "")
                 if (type == "online_status") {
                     val statusUserId = json.getString("userId")
@@ -137,32 +139,42 @@ fun HomeScreen(
     Scaffold(
         containerColor = AppBlack,
         floatingActionButton = {
-            Column(horizontalAlignment = Alignment.End) {
-                FloatingActionButton(
-                    onClick = { onCreateGroupClick() },
-                    containerColor = AppGreen.copy(alpha = 0.85f),
-                    contentColor = AppBlack,
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.communities_icon),
-                        contentDescription = "Create Group",
-                        modifier = Modifier.size(20.dp),
-                        colorFilter = ColorFilter.tint(AppBlack)
-                    )
+            if (selectedTab == 0) {
+                Column(horizontalAlignment = Alignment.End) {
+                    FloatingActionButton(
+                        onClick = { onCreateGroupClick() },
+                        containerColor = AppGreen.copy(alpha = 0.85f),
+                        contentColor = AppBlack,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.communities_icon),
+                            contentDescription = "Create Group",
+                            modifier = Modifier.size(20.dp),
+                            colorFilter = ColorFilter.tint(AppBlack)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    FloatingActionButton(
+                        onClick = {},
+                        containerColor = AppGreen,
+                        contentColor = AppBlack
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.message_4475881),
+                            contentDescription = "New Chat",
+                            modifier = Modifier.size(20.dp),
+                            colorFilter = ColorFilter.tint(AppBlack)
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.height(12.dp))
+            } else if (selectedTab == 1) {
                 FloatingActionButton(
-                    onClick = {},
                     containerColor = AppGreen,
+                    onClick = {},
                     contentColor = AppBlack
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.message_4475881),
-                        contentDescription = "New Chat",
-                        modifier = Modifier.size(20.dp),
-                        colorFilter = ColorFilter.tint(AppBlack)
-                    )
+                    Icon(contentDescription = "", painter = painterResource(R.drawable.baseline_photo_camera_24))
                 }
             }
         },
@@ -170,44 +182,107 @@ fun HomeScreen(
             BottomNavigation(selectedTab = selectedTab, onTabSelected = onTabSelected)
         }
     ) {
-        Column(modifier = Modifier.padding(it).background(AppBlack)) {
-            TopBar({}, {})
-            Spacer(modifier = Modifier.height(5.dp))
-            HorizontalDivider(modifier = Modifier.fillMaxWidth(), color = AppDarkGray)
-            Spacer(modifier = Modifier.height(5.dp))
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .background(AppBlack)
+        ) {
+            when (selectedTab) {
+                0 -> {
+                    TopBar({}, {})
+                    Spacer(modifier = Modifier.height(5.dp))
+                    HorizontalDivider(modifier = Modifier.fillMaxWidth(), color = AppDarkGray)
+                    Spacer(modifier = Modifier.height(5.dp))
 
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = AppGreen)
-                }
-            } else if (errorText.isNotEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = errorText, color = Color.Red, fontSize = 14.sp)
-                }
-            } else if (chatData.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "No conversations yet", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = AppGray)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = "Sign up more users to start chatting!", fontSize = 13.sp, color = AppGray)
+                    if (isLoading) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = AppGreen)
+                        }
+                    } else if (errorText.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = errorText, color = Color.Red, fontSize = 14.sp)
+                        }
+                    } else if (chatData.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "No conversations yet", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = AppGray)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(text = "Sign up more users to start chatting!", fontSize = 13.sp, color = AppGray)
+                            }
+                        }
+                    } else {
+                        LazyColumn {
+                            items(chatData) { chat ->
+                                ChatDesign(chatListModel = chat, onClick = { onChatClick(chat) })
+                            }
+                        }
                     }
                 }
-            } else {
-                LazyColumn {
-                    items(chatData) { chat ->
-                        ChatDesign(chatListModel = chat, onClick = { onChatClick(chat) })
+                1 -> {
+                    UpdateScreen(selectedTab = selectedTab, onTabSelected = onTabSelected)
+                }
+                2 -> {
+                    TopBar({}, {})
+                    Spacer(modifier = Modifier.height(5.dp))
+                    HorizontalDivider(modifier = Modifier.fillMaxWidth(), color = AppDarkGray)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    CommunitiesScreenContent()
+                }
+                3 -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ComingSoon()
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CommunitiesScreenContent() {
+    val communitiesModel = listOf(
+        CommunityItemModel("Anshul", 2738, true),
+        CommunityItemModel("Anshul", 2738, false),
+        CommunityItemModel("Anshul", 2738, false),
+        CommunityItemModel("Anshul", 2738, false),
+        CommunityItemModel("Anshul", 2738, false),
+        CommunityItemModel("Anshul", 2738, false),
+        CommunityItemModel("Anshul", 2738, true)
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        item {
+            Text(text = "Community", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = AppWhite)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "By joining the communities you get the info regarding communities in your area",
+                color = AppGray,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Find Channels to follow", color = AppGreen, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        items(communitiesModel) { item ->
+            CommunityItem(item)
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
