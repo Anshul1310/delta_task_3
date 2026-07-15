@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -42,6 +43,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -126,6 +128,7 @@ fun ChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
     var replyToMessage by remember { mutableStateOf<ChatMessage?>(null) }
     var showVoiceDialog by remember { mutableStateOf(false) }
     var showImageViewer by remember { mutableStateOf<String?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
 
     val myUserId = ApiClient.getUserId()
     val peerId = chatListModel.userId
@@ -140,7 +143,9 @@ fun ChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
             coroutineScope.launch {
                 val file = uriToFile(context, uri)
                 if (file != null) {
+                    isUploading = true
                     val uploadResult = ApiClient.uploadFile(file)
+                    isUploading = false
                     if (uploadResult.isSuccess) {
                         val mediaUrl = uploadResult.getOrDefault("")
                         ChatSocketManager.sendPrivateMessage(
@@ -320,7 +325,9 @@ fun ChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
                 showVoiceDialog = false
                 if (file != null && file.exists()) {
                     coroutineScope.launch {
+                        isUploading = true
                         val uploadResult = ApiClient.uploadFile(file)
+                        isUploading = false
                         if (uploadResult.isSuccess) {
                             val mediaUrl = uploadResult.getOrDefault("")
                             ChatSocketManager.sendPrivateMessage(
@@ -345,6 +352,22 @@ fun ChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
             imageUrl = showImageViewer!!,
             onDismiss = { showImageViewer = null }
         )
+    }
+
+    if (isUploading) {
+        Dialog(
+            onDismissRequest = {},
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(AppDarkSurface, RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AppGreen)
+            }
+        }
     }
 
     Scaffold(
@@ -419,7 +442,11 @@ fun ChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
             )
         },
         bottomBar = {
-            Column(modifier = Modifier.background(AppDarkSurface)) {
+            Column(
+                modifier = Modifier
+                    .background(AppDarkSurface)
+                    .navigationBarsPadding()
+            ) {
                 AnimatedVisibility(visible = replyToMessage != null) {
                     if (replyToMessage != null) {
                         Row(
@@ -673,7 +700,7 @@ fun ChatBubble(
                 if (message.messageType == "voice") {
                     VoiceNotePlayer(message = message)
                 } else if (message.messageType == "image" && message.mediaUrl != null) {
-                    val fullUrl = ApiClient.getBaseUrl() + message.mediaUrl
+                    val fullUrl = getFullMediaUrl(message.mediaUrl)
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(fullUrl)
@@ -755,7 +782,7 @@ fun VoiceNotePlayer(message: ChatMessage) {
                     isPlaying = false
                 } else {
                     try {
-                        val url = ApiClient.getBaseUrl() + message.mediaUrl
+                        val url = getFullMediaUrl(message.mediaUrl)
                         val player = MediaPlayer()
                         player.setDataSource(url)
                         player.prepareAsync()
@@ -1012,5 +1039,14 @@ fun formatTime(isoString: String): String {
         return ""
     } catch (_: Exception) {
         return ""
+    }
+}
+
+fun getFullMediaUrl(mediaUrl: String?): String {
+    if (mediaUrl.isNullOrEmpty()) return ""
+    return if (mediaUrl.startsWith("http://") || mediaUrl.startsWith("https://")) {
+        mediaUrl
+    } else {
+        ApiClient.getBaseUrl() + mediaUrl
     }
 }

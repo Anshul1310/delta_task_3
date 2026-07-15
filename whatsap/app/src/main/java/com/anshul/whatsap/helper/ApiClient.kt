@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
 
-    private const val BASE_URL = "http://43.205.214.11:4000"
+    private const val BASE_URL = "http://3.110.157.219:4000"
 
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,6 +41,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -89,6 +93,7 @@ fun GroupChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
     var replyToMessage by remember { mutableStateOf<ChatMessage?>(null) }
     var showVoiceDialog by remember { mutableStateOf(false) }
     var showImageViewer by remember { mutableStateOf<String?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
 
     val myUserId = ApiClient.getUserId()
     val roomId = chatListModel.roomId
@@ -103,7 +108,9 @@ fun GroupChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
             coroutineScope.launch {
                 val file = uriToFile(context, uri)
                 if (file != null) {
+                    isUploading = true
                     val uploadResult = ApiClient.uploadFile(file)
+                    isUploading = false
                     if (uploadResult.isSuccess) {
                         val mediaUrl = uploadResult.getOrDefault("")
                         ChatSocketManager.sendGroupMessage(
@@ -264,7 +271,9 @@ fun GroupChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
                 showVoiceDialog = false
                 if (file != null && file.exists()) {
                     coroutineScope.launch {
+                        isUploading = true
                         val uploadResult = ApiClient.uploadFile(file)
+                        isUploading = false
                         if (uploadResult.isSuccess) {
                             val mediaUrl = uploadResult.getOrDefault("")
                             ChatSocketManager.sendGroupMessage(
@@ -289,6 +298,22 @@ fun GroupChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
             imageUrl = showImageViewer!!,
             onDismiss = { showImageViewer = null }
         )
+    }
+
+    if (isUploading) {
+        Dialog(
+            onDismissRequest = {},
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(AppDarkSurface, RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AppGreen)
+            }
+        }
     }
 
     Scaffold(
@@ -345,7 +370,11 @@ fun GroupChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
             )
         },
         bottomBar = {
-            Column(modifier = Modifier.background(AppDarkSurface)) {
+            Column(
+                modifier = Modifier
+                    .background(AppDarkSurface)
+                    .navigationBarsPadding()
+            ) {
                 AnimatedVisibility(visible = replyToMessage != null) {
                     if (replyToMessage != null) {
                         Row(
