@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String       @id @default(uuid())
+  name             String
+  email            String       @unique
+  password         String
+  isOnline         Boolean      @default(false)
+  lastSeen         DateTime     @default(now())
+  publicKey        String?
+  createdAt        DateTime     @default(now())
+  sentMessages     Message[]    @relation("SentMessages")
+  receivedMessages Message[]    @relation("ReceivedMessages")
+  rooms            RoomMember[]
+}
+
+model Room {
+  id        String       @id @default(uuid())
+  name      String?
+  isGroup   Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  messages  Message[]
+  members   RoomMember[]
+}
+
+model RoomMember {
+  id     String @id @default(uuid())
+  userId String
+  roomId String
+  user   User   @relation(fields: [userId], references: [id])
+  room   Room   @relation(fields: [roomId], references: [id])
+
+  @@unique([userId, roomId])
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  content     String
+  messageType String   @default("text")
+  mediaUrl    String?
+  status      String   @default("SENT")
+  createdAt   DateTime @default(now())
+
+  // Sender relation
+  senderId String
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id])
+
+  // Recipient for Private Chat (Optional if it's a group chat)
+  receiverId String?
+  receiver   User?   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  // Room for Group Chat (Optional if it's a private chat)
+  roomId String?
+  room   Room?   @relation(fields: [roomId], references: [id])
+
+  // Reply-to support
+  replyToId String?
+  replyTo   Message?  @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies   Message[] @relation("MessageReplies")
+}
