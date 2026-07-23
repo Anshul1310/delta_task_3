@@ -331,8 +331,7 @@ object ApiClient {
                         "file",
                         file.name,
                         file.asRequestBody("application/octet-stream".toMediaType())
-                    )
-                    .build()
+                    ).build()
 
                 val request = Request.Builder()
                     .url("$BASE_URL/upload")
