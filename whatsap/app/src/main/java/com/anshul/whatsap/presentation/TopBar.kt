@@ -35,23 +35,6 @@ fun TopBar(OnSearchClick: () -> Unit, OndotClick: () -> Unit) {
             color = AppGreen,
             fontWeight = FontWeight.ExtraBold
         )
-        Row {
-            IconButton(onClick = { OnSearchClick() }) {
-                Image(
-                    modifier = Modifier.size(22.dp),
-                    painter = painterResource(R.drawable.search),
-                    contentDescription = "Search",
-                    colorFilter = ColorFilter.tint(AppWhite)
-                )
-            }
-            IconButton(onClick = { OndotClick() }) {
-                Image(
-                    modifier = Modifier.size(22.dp),
-                    painter = painterResource(R.drawable.more),
-                    contentDescription = "More",
-                    colorFilter = ColorFilter.tint(AppWhite)
-                )
-            }
-        }
+
     }
 }

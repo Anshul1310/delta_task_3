@@ -64,6 +64,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,8 +86,9 @@ import java.io.File
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview(showSystemUi = true)
 @Composable
-fun GroupChatScreen(chatListModel: ChatListModel, onBack: () -> Unit) {
+fun GroupChatScreen(chatListModel: ChatListModel= ChatListModel(), onBack: () -> Unit={}) {
     var messageText by remember { mutableStateOf("") }
     val messages = remember { mutableStateListOf<ChatMessage>() }
     var typingUserName by remember { mutableStateOf("") }

@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.anshul.whatsap.R
@@ -37,17 +38,8 @@ import com.anshul.whatsap.ui.theme.AppGray
 import com.anshul.whatsap.ui.theme.AppGreen
 
 @Composable
+@Preview(showSystemUi = true)
 fun SplashScreen() {
-    var visible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        visible = true
-    }
-
-
-
-
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +72,7 @@ fun SplashScreen() {
             color = AppGray,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .then(Modifier.height(100.dp))
+                .height(100.dp)
         )
     }
 }

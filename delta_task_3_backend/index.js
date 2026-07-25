@@ -231,13 +231,6 @@ app.get('/rooms', authenticateToken, async function (req, res) {
             include: {
                 room: {
                     include: {
-                        members: {
-                            include: {
-                                user: {
-                                    select: { id: true, name: true, isOnline: true }
-                                }
-                            }
-                        },
                         messages: {
                             orderBy: { createdAt: 'desc' },
                             take: 1
@@ -257,6 +250,7 @@ app.get('/rooms', authenticateToken, async function (req, res) {
         return res.status(500).json({ error: 'Server error fetching rooms' });
     }
 });
+
 
 app.get("/health", (req, res) => {
     res.send("hello")
@@ -337,30 +331,6 @@ app.get('/rooms/:roomId/messages', authenticateToken, async function (req, res) 
     }
 });
 
-app.post('/rooms/:roomId/members', authenticateToken, async function (req, res) {
-    try {
-        var roomId = req.params.roomId;
-        var memberIds = req.body.memberIds;
-
-        if (!memberIds || memberIds.length === 0) {
-            return res.status(400).json({ error: 'At least one member ID is required' });
-        }
-
-        var membersData = memberIds.map(function (memberId) {
-            return { userId: memberId, roomId: roomId };
-        });
-
-        await prisma.roomMember.createMany({
-            data: membersData,
-            skipDuplicates: true
-        });
-
-        return res.status(200).json({ message: 'Members added successfully' });
-    } catch (error) {
-        console.error('Add members error:', error);
-        return res.status(500).json({ error: 'Server error adding members' });
-    }
-});
 
 app.post('/upload', authenticateToken, upload.single('file'), function (req, res) {
     try {
@@ -372,41 +342,6 @@ app.post('/upload', authenticateToken, upload.single('file'), function (req, res
     } catch (error) {
         console.error('Upload error:', error);
         return res.status(500).json({ error: 'Server error uploading file' });
-    }
-});
-
-app.post('/publickey', authenticateToken, async function (req, res) {
-    try {
-        var publicKey = req.body.publicKey;
-        if (!publicKey) {
-            return res.status(400).json({ error: 'Public key is required' });
-        }
-
-        await prisma.user.update({
-            where: { id: req.userId },
-            data: { publicKey: publicKey }
-        });
-
-        return res.status(200).json({ message: 'Public key saved' });
-    } catch (error) {
-        console.error('Save public key error:', error);
-        return res.status(500).json({ error: 'Server error saving public key' });
-    }
-});
-
-app.get('/publickey/:userId', authenticateToken, async function (req, res) {
-    try {
-        var user = await prisma.user.findUnique({
-            where: { id: req.params.userId },
-            select: { publicKey: true }
-        });
-        if (!user || !user.publicKey) {
-            return res.status(404).json({ error: 'Public key not found' });
-        }
-        return res.status(200).json({ publicKey: user.publicKey });
-    } catch (error) {
-        console.error('Get public key error:', error);
-        return res.status(500).json({ error: 'Server error fetching public key' });
     }
 });
 

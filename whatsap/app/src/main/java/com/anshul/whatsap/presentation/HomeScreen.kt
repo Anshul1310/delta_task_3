@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.anshul.whatsap.R
@@ -44,11 +45,12 @@ import kotlinx.coroutines.flow.collectLatest
 import org.json.JSONObject
 
 @Composable
+@Preview(showSystemUi = true)
 fun HomeScreen(
-    onChatClick: (ChatListModel) -> Unit,
-    onCreateGroupClick: () -> Unit,
-    selectedTab: Int,
-    onTabSelected: (Int) -> Unit
+    onChatClick: (ChatListModel) -> Unit = { } ,
+    onCreateGroupClick: () -> Unit={},
+    selectedTab: Int=0,
+    onTabSelected: (Int) -> Unit={}
 ) {
     var chatData by remember { mutableStateOf(listOf<ChatListModel>()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -155,18 +157,7 @@ fun HomeScreen(
                         )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
-                    FloatingActionButton(
-                        onClick = {},
-                        containerColor = AppGreen,
-                        contentColor = AppBlack
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.message_4475881),
-                            contentDescription = "New Chat",
-                            modifier = Modifier.size(20.dp),
-                            colorFilter = ColorFilter.tint(AppBlack)
-                        )
-                    }
+
                 }
             } else if (selectedTab == 1) {
                 FloatingActionButton(
@@ -216,7 +207,7 @@ fun HomeScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(text = "No conversations yet", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = AppGray)
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = "Sign up more users to start chatting!", fontSize = 13.sp, color = AppGray)
+                                Text(text = "Please addd users", fontSize = 13.sp, color = AppGray)
                             }
                         }
                     } else {

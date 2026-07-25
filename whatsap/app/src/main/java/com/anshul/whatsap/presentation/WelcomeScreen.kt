@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.anshul.whatsap.R
@@ -32,7 +33,8 @@ import com.anshul.whatsap.ui.theme.AppGreen
 import com.anshul.whatsap.ui.theme.AppWhite
 
 @Composable
-fun WelcomeScreen(onLoginClick: () -> Unit, onSignupClick: () -> Unit) {
+@Preview(showSystemUi = true)
+fun WelcomeScreen(onLoginClick: () -> Unit={}, onSignupClick: () -> Unit={}) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +62,7 @@ fun WelcomeScreen(onLoginClick: () -> Unit, onSignupClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Read our Privacy Policy. Tap 'Agree & Continue' to accept the rules.",
+                text = "Welcome to the App, BUDDY",
                 color = AppGray,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
