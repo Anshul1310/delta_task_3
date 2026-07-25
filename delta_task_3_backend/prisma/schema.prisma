@@ -49,19 +49,15 @@ model Message {
   status      String   @default("SENT")
   createdAt   DateTime @default(now())
 
-  // Sender relation
   senderId String
   sender   User   @relation("SentMessages", fields: [senderId], references: [id])
 
-  // Recipient for Private Chat (Optional if it's a group chat)
   receiverId String?
   receiver   User?   @relation("ReceivedMessages", fields: [receiverId], references: [id])
 
-  // Room for Group Chat (Optional if it's a private chat)
   roomId String?
   room   Room?   @relation(fields: [roomId], references: [id])
 
-  // Reply-to support
   replyToId String?
   replyTo   Message?  @relation("MessageReplies", fields: [replyToId], references: [id])
   replies   Message[] @relation("MessageReplies")
